@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TempFileShare — временное хранение файлов</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="data:,">
+</head>
+<body>
+<div class="container">
+    <header>
+        <h1>TempFileShare</h1>
+        <p class="subtitle">Загрузи файл — получи ссылку на 30 дней</p>
+    </header>
+
+    <div class="upload-area" id="upload-area">
+        <div class="upload-icon">📄</div>
+        <p class="upload-text">Перетащи файл сюда или кликни для выбора</p>
+        <button class="btn primary" id="select-btn">Выбрать файл</button>
+        <input type="file" id="file-input" accept="*/*">
+        <p id="filename-display" class="filename"></p>
+    </div>
+
+    <div class="progress-container" id="progress-container">
+        <div class="progress-info">
+            <span id="progress-text">0%</span>
+            <span id="speed-text"></span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+    </div>
+
+    <div class="result" id="result">
+        <h3 class="success-title">✅ Файл успешно загружен!</h3>
+        <p>Ссылка действительна 30 дней с момента последнего скачивания:</p>
+        <div class="link-wrapper">
+            <input type="text" id="link-input" readonly>
+            <button class="btn copy" id="copy-btn">Скопировать</button>
+        </div>
+        <button class="btn outline" id="new-upload-btn">Загрузить ещё один</button>
+        <div class="expires">
+            Файл автоматически удалится через 30 дней без скачиваний
+        </div>
+    </div>
+
+    <div class="error" id="error">
+        <h3>Ошибка</h3>
+        <p id="error-message"></p>
+        <button class="btn outline" id="retry-btn">Попробовать снова</button>
+    </div>
+
+    <div class="stats-button-wrapper">
+        <a href="/stats" class="btn outline stats-button">
+            Статистика
+        </a>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <span>TempFileShare • 2025</span>
+            <span id="theme-toggle">Тема</span>
+        </div>
+    </footer>
+</div>
+
+<script src="js/util.js"></script>
+<script src="js/fileUploader.js"></script>
+<script src="js/uiController.js"></script>
+<script src="js/script.js"></script>
+
+</body>
+</html>
