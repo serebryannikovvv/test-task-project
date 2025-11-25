@@ -1,0 +1,156 @@
+{
+  "info": {
+    "_postman_id": "8f5d9a1c-3e4d-4b2a-9f6d-1a2b3c4d5e6f",
+    "name": "Weather Service Test",
+    "description": "Тестовая коллекция для сервиса погоды (чистая Java 8 + Jetty + Redis cache)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Получить погоду (первый запрос — с API)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/weather?city=Moscow",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["weather"],
+          "query": [
+            {
+              "key": "city",
+              "value": "Moscow"
+            }
+          ]
+        },
+        "description": "Первый запрос — данные возьмутся из Open-Meteo API и закешируются в Redis на 15 минут"
+      }
+    },
+    {
+      "name": "Повторный запрос (из кэша)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/weather?city=Moscow",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["weather"],
+          "query": [
+            {
+              "key": "city",
+              "value": "Moscow"
+            }
+          ]
+        },
+        "description": "В течение 15 минут — вернёт данные из Redis (быстро, без запросов к API)"
+      }
+    },
+    {
+      "name": "Другой город — Berlin",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/weather?city=Berlin",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["weather"],
+          "query": [
+            {
+              "key": "city",
+              "value": "Berlin"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Другой город — Saint Petersburg",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/weather?city=Saint Petersburg",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["weather"],
+          "query": [
+            {
+              "key": "city",
+              "value": "Saint Petersburg"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Несуществующий город",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/weather?city=Asdfghjkl123",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["weather"],
+          "query": [
+            {
+              "key": "city",
+              "value": "Asdfghjkl123"
+            }
+          ]
+        },
+        "description": "Должен вернуть 404 с сообщением «Город не найден»"
+      }
+    },
+    {
+      "name": "Без параметра city",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:8080/weather",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "8080",
+          "path": ["weather"]
+        },
+        "description": "Должен вернуть 400 Bad Request"
+      }
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "pm.test('Status code is 200', function () {",
+          "    pm.response.to.have.status(200);",
+          "});",
+          "",
+          "pm.test('Response contains chart image', function () {",
+          "    pm.expect(pm.response.text()).to.include('data:image/png;base64,');",
+          "});",
+          "",
+          "pm.test('Response contains temperature table', function () {",
+          "    pm.expect(pm.response.text()).to.include('<table');",
+          "});"
+        ]
+      }
+    }
+  ]
+}
