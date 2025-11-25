@@ -1,0 +1,151 @@
+{
+  "info": {
+    "name": "TempFileShare — Java 8 File Service",
+    "description": "Полная коллекция для тестирования сервиса временного хранения файлов\n• Raw binary upload\n• Range-запросы\n• Автоочистка\n• Статистика\n• Graceful shutdown",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "description": "Базовый URL сервиса"
+    },
+    {
+      "key": "download_link",
+      "value": "",
+      "description": "Полная ссылка на скачивание (сохраняется после загрузки)"
+    },
+    {
+      "key": "file_id",
+      "value": "",
+      "description": "ID загруженного файла (UUID)"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/health"
+      },
+      "response": []
+    },
+    {
+      "name": "Upload File (raw binary + X-Filename)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Upload successful', function () {",
+              "    pm.response.to.have.status(200);",
+              "    const json = pm.response.json();",
+              "    pm.expect(json.success).to.be.true;",
+              "",
+              "    pm.collectionVariables.set('download_link', json.downloadLink);",
+              "    pm.collectionVariables.set('file_id', json.fileId);",
+              "",
+              "    console.log('Ссылка:', json.downloadLink);",
+              "    console.log('ID:', json.fileId);",
+              "    console.log('Размер:', pm.response.headers.get('Content-Length') || 'неизвестен');",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "X-Filename",
+            "value": "важный_документ.pdf",
+            "description": "Имя файла на клиенте (можно менять)"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/octet-stream",
+            "description": "Обязательно для raw-загрузки"
+          }
+        ],
+        "body": {
+          "mode": "file",
+          "file": {
+            "src": "path/to/your/test-file.pdf"
+          },
+          "options": {
+            "raw": {
+              "language": "text"
+            }
+          }
+        },
+        "url": "{{base_url}}/upload",
+        "description": "Загрузка файла как raw binary поток.\nВАЖНО: в Postman выбери Body → binary → выбери файл"
+      },
+      "response": []
+    },
+    {
+      "name": "Download File (по полной ссылке)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{download_link}}",
+        "description": "Скачивает файл по ссылке, которую вернул upload"
+      },
+      "response": []
+    },
+    {
+      "name": "Download File (по ID) — правильный путь",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/file/{{file_id}}",
+        "description": "Скачивание по ID — правильный путь у твоего сервиса"
+      },
+      "response": []
+    },
+    {
+      "name": "Range Request (скачать только первые 1MB)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Range",
+            "value": "bytes=0-1048575"
+          }
+        ],
+        "url": "{{download_link}}",
+        "description": "Проверка поддержки Range-запросов (должно вернуть 206 Partial Content)"
+      },
+      "response": []
+    },
+    {
+      "name": "Stats — JSON API",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/api/stats"
+      },
+      "response": []
+    },
+    {
+      "name": "Stats — страница в браузере",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/stats"
+      },
+      "response": []
+    },
+    {
+      "name": "Frontend — главная страница",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{base_url}}/"
+      },
+      "response": []
+    }
+  ]
+}
